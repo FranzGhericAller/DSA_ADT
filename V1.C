@@ -9,7 +9,11 @@ typedef struct {
 }List;
 
 List L;
-
+List insertPos(List L, int data, int position);
+List deletePos(List L, int position);
+int locate(List L, int data);
+List insertSorted(List L, int data);
+List display(List L);
 
 int main(){
 
