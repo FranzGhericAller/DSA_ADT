@@ -1,0 +1,206 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+
+typedef struct node{
+    int data; 
+    struct node *next;
+} Node;
+
+typedef struct{
+    Node *head;
+    int count;
+    
+} List;
+
+List *initialize();
+void empty(List *list);
+void insertFirst(List *list, int data);
+void insertLast(List *list, int data);
+void insertPos(List *list, int data, int index);
+void deleteStart(List *list);
+void deleteLast(List *list);
+int retrieve(List *list, int index);
+int locate(List *list, int data);
+void display(List *list);
+
+int main() {
+        List *list = initialize();
+    if (list == NULL) {
+        printf("Failed to initialize list.\n");
+        return 1;
+    }
+
+    // Insert some elements
+    insertFirst(list, 5);    // List: 5
+    insertFirst(list, 6);    // List: 6 -> 5
+    insertLast(list, 7);     // List: 6 -> 5 -> 7
+    insertPos(list, 10, 1);  // List: 6 -> 10 -> 5 -> 7
+
+    printf("List after insertions: ");
+    display(list);
+
+    // Retrieve element at index 2
+    int val = retrieve(list, 2);
+    printf("Element at index 2: %d\n", val);
+
+    // Locate value 10
+    int pos = locate(list, 10);
+    if (pos != -1) {
+        printf("Value 10 found at index %d\n", pos);
+    } else {
+        printf("Value 10 not found\n");
+    }
+
+    // Delete first element
+    deleteStart(list);
+    printf("List after deleting start: ");
+    display(list);
+
+    // Delete last element
+    deleteLast(list);
+    printf("List after deleting last: ");
+    display(list);
+
+    // Empty the list
+    empty(list);
+    printf("List after emptying: ");
+    display(list);
+
+    // Free the list structure itself
+    free(list);
+    return 0;
+}
+
+List *initialize(){
+    List* list = (List*)malloc(sizeof(List));
+    if(list == NULL){
+        return NULL;
+    }
+    list->head = NULL;
+    list->count = 0;
+    return list;
+    
+}
+void empty(List *list){
+    Node* current = list->head;
+    Node* temp;
+    while(current != NULL){
+        temp = current;
+        current = current->next;
+        free(temp);
+    }
+    list->head = NULL;
+    list->count = 0;
+}
+void insertFirst(List *list, int data){
+    Node *newNode = malloc(sizeof(Node));
+    newNode->data = data;
+    newNode->next = list->head;
+    list->head = newNode;
+    list->count++;
+}
+void insertLast(List *list, int data){
+    Node *newNode = malloc(sizeof(Node));
+    if(newNode == NULL) return;
+    newNode->data = data;
+    newNode->next = NULL;
+    
+    if(list == NULL){
+        list->head = newNode;
+    }else{
+        Node *current = list->head;
+        while(current->next != NULL){
+            current = current->next;
+        }
+        current->next = newNode;
+    }
+    list->count++;
+}
+void insertPos(List *list, int data, int index){
+    if(index < 0 || index > list->count){
+        return;
+    }
+    if(index == 0){
+        insertFirst(list,data);
+        return;
+    }
+    if(index == list->count){
+        insertLast(list,data);
+        return;
+    }
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    if(newNode == NULL){
+        return;
+    }
+    newNode->data = data;
+    
+    Node* current = list->head;
+    for(int i = 0; i < index - 1; i++){
+        current = current->next;
+    }
+    
+    newNode->next = current->next;
+    current->next = newNode;
+    
+    list->count++;
+}
+void deleteStart(List *list){
+    if(list == NULL || list->head == NULL) return;
+    Node *current = list->head;
+    list->head = current->next;
+    free(current);
+    list->count--;
+}
+void deleteLast(List *list){
+    if(list == NULL || list->head == NULL)return;
+    if(list->count == 1){
+        free(list->head);
+        list->head = NULL;
+        list->count--;
+        return;
+    }
+    Node* current = list->head;
+    for(int i = 0; i < list->count - 2; i++){
+        current = current->next;
+    }
+    free(current->next);
+    current->next = NULL;
+    list->count--;
+}
+int retrieve(List *list, int index){
+    if(index < 0 || index >= list->count){
+        return -1;
+    }
+    Node* current = list->head;
+    
+    for(int i = 0; i < index; i++){
+        current = current->next;
+    }
+    return current->data;
+}
+int locate(List *list, int data){
+    if(list->head == NULL){
+        return -1;
+    }
+    Node* current = list->head;
+    int index = 0;
+    
+    while (current != NULL){
+        if(current->data == data){
+            return index;
+        }
+        current = current->next;
+        index++;
+    }
+    return -1;
+}
+void display(List *list){
+    Node* current = list->head;
+    
+    while(current != NULL){
+        printf("%d", current->data);
+        current = current->next;
+    }
+    printf("\n");
+}
